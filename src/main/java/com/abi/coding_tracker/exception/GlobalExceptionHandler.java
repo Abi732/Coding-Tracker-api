@@ -74,4 +74,17 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
+
+    @ExceptionHandler(ExternalApiException.class)
+    public ResponseEntity<ErrorResponse> handleExternalApiException(ExternalApiException ex){
+        log.error("External API Error : {}", ex.getMessage());
+
+        ErrorResponse errorResponse = new ErrorResponse(
+            LocalDateTime.now(), 
+            ex.getStatusCode(), 
+            ex.getMessage()
+        );
+
+        return ResponseEntity.status(ex.getStatusCode()).body(errorResponse);
+    }
 }

@@ -42,6 +42,7 @@ public class SecurityConfig {
         .authorizeHttpRequests(auth->auth
             .requestMatchers("/auth/**").permitAll()
             .requestMatchers("/actuator/health").permitAll()
+            .requestMatchers("/leetcode/**").permitAll()
             .requestMatchers(
                 "/v3/api-docs/**",
                 "/swagger-ui/**",
