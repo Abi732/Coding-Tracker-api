@@ -18,6 +18,7 @@ import com.abi.coding_tracker.leetcode.entity.LeetcodeProfile;
 import com.abi.coding_tracker.leetcode.entity.LeetcodeStatsSnapshot;
 import com.abi.coding_tracker.leetcode.repository.LeetcodeProfileRespository;
 import com.abi.coding_tracker.leetcode.repository.LeetcodeStatsSnapshotsRepository;
+import com.abi.coding_tracker.platform.CodingPlatformService;
 import com.abi.coding_tracker.repository.UserRepository;
 
 
@@ -25,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-public class LeetcodeProfileService {
+public class LeetcodeProfileService implements CodingPlatformService {
 
     private final UserRepository userRepository;
     private final LeetcodeProfileRespository profileRepository;
@@ -40,6 +41,24 @@ public class LeetcodeProfileService {
         this.profileRepository = profileRepository;
         this.snapshotRepository = snapshotRepository;
         this.leetcodeService = leetcodeService;
+    }
+
+    @Override
+    public String getPlatformName(){
+        return "leetcode";
+    }
+
+    @Override
+    public LocalDateTime getLastSync(User user){
+        return profileRepository.findByUser(user).map(LeetcodeProfile :: getLastSyncedAt).orElse(null);
+    }
+
+    @Override
+    public void refresh(User user){
+        profileRepository.findByUser(user).ifPresent(profile->{
+            log.info("Interface triggered refresh for leetcode user: {} ", user.getEmail());
+            syncProfileStats(profile, true);
+        });
     }
 
     @Transactional 

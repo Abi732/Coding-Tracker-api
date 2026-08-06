@@ -1,0 +1,36 @@
+package com.abi.coding_tracker.dashboard.dto;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+
+import com.abi.coding_tracker.codeforces.dto.CodeforcesProfileResponse;
+import com.abi.coding_tracker.leetcode.dto.LeetcodeStatsResponse;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class DashboardResponse {
+    private UserSummary user;
+    private LeetcodeStatsResponse leetcode;
+    private CodeforcesProfileResponse codeforces;
+    private GithubProfileResponse github;
+
+    private DashboardStats statistics;
+
+    private List<RecentActivity> recentActivitiy;
+
+    private Map<String, String> services;
+
+    private List<String> errors;
+
+    private String Apiversion;
+    private LocalDateTime generatedAt;
+    private boolean fullyCached;
+}
