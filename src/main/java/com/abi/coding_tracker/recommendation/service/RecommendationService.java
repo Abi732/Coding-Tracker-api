@@ -8,7 +8,14 @@ import org.springframework.stereotype.Service;
 import com.abi.coding_tracker.analytics.dto.AnalyticsSummaryResponse;
 import com.abi.coding_tracker.analytics.dto.DifficultyDistributionResponse;
 import com.abi.coding_tracker.analytics.service.AnalyticsService;
+import com.abi.coding_tracker.entity.User;
+import com.abi.coding_tracker.exception.ResourceNotFoundException;
+import com.abi.coding_tracker.github.entity.GithubProfile;
+import com.abi.coding_tracker.github.entity.GithubSnapshot;
+import com.abi.coding_tracker.github.repository.GithubProfileRepository;
+import com.abi.coding_tracker.github.repository.GithubSnapshotRepository;
 import com.abi.coding_tracker.recommendation.dto.RecommendationResponse;
+import com.abi.coding_tracker.repository.UserRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,13 +24,25 @@ import lombok.extern.slf4j.Slf4j;
 public class RecommendationService {
     
     private final AnalyticsService analyticsService;
+    private final UserRepository userRepository;
+    private final GithubProfileRepository githubProfileRepository;
+    private final GithubSnapshotRepository githubSnapshotRepository;
 
-    public RecommendationService(AnalyticsService analyticsService){
+    public RecommendationService(AnalyticsService analyticsService,
+                                UserRepository userRepository,
+                                GithubProfileRepository githubProfileRepository,
+                                GithubSnapshotRepository githubSnapshotRepository
+    ){
         this.analyticsService = analyticsService;
+        this.userRepository = userRepository;
+        this.githubProfileRepository = githubProfileRepository;
+        this.githubSnapshotRepository = githubSnapshotRepository;
     }
 
     public RecommendationResponse generateRecommendation(String email){
         log.info("Generating personalized recommendation for user: {}", email);
+
+        User user = userRepository.findByEmail(email).orElseThrow(()-> new ResourceNotFoundException("User not found"));
 
         AnalyticsSummaryResponse summaryResponse = analyticsService.getAnalyticsSummary(email);
         DifficultyDistributionResponse difficulty = analyticsService.getDifficultyDistribution(email);
@@ -31,6 +50,12 @@ public class RecommendationService {
         int totalSolved = summaryResponse.getLeetcodeSolved();
         Integer cfRating = summaryResponse.getCodeforcesRating();
         int streak = summaryResponse.getCurrentStreak();
+
+        GithubProfile githubProfile = githubProfileRepository.findByUser(user).orElse(null);
+        GithubSnapshot githubSnapshot = null;
+        if(githubProfile != null){
+            githubSnapshot = githubSnapshotRepository.findTopByProfileOrderByFetchedAtDesc(githubProfile).orElse(null);
+        } 
 
         //classify user level 
         String level = classifyUserLevel(totalSolved);
@@ -58,6 +83,20 @@ public class RecommendationService {
             recommendation.add("Your Codeforces rating is in the Newbie range. Participate in Div-3 and Div-4 contests to build speed.");
         } else if (cfRating >= 1200 && cfRating < 1400) {
             recommendation.add("Great job reaching Pupil! Focus on solving B and C level problems in Div-2 contests.");
+        }
+
+        //Github Recommendation
+        if(githubProfile == null){
+            recommendation.add("Connect your Github account to track your open-source contribution and repository growth.");
+        }else if(githubSnapshot != null){
+            if(githubSnapshot.getPublic_repos() == 0){
+                recommendation.add("You have no public repositories on GitHub. Try building and publishing a new project!");
+            }else if (githubSnapshot.getPublic_repos() < 3) {
+                recommendation.add("You have a few repositories. Keep building projects to showcase your skills to employers.");
+            }
+            if (githubSnapshot.getTotalStars() == 0 && githubSnapshot.getPublic_repos() > 0) {
+                 recommendation.add("Share your repositories with others or write great documentation to start earning GitHub stars.");
+            }
         }
 
         // Rule: Consistency and Streaks

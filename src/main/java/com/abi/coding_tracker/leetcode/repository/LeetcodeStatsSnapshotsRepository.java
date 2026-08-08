@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.abi.coding_tracker.leaderboard.dto.LeaderBoardResponse;
+import com.abi.coding_tracker.leaderboard.dto.LeaderboardProjection;
 import com.abi.coding_tracker.leetcode.entity.LeetcodeProfile;
 import com.abi.coding_tracker.leetcode.entity.LeetcodeStatsSnapshot;
 
@@ -19,11 +20,17 @@ public interface LeetcodeStatsSnapshotsRepository extends JpaRepository<Leetcode
 
     List<LeetcodeStatsSnapshot> findTop2ByProfileOrderByFetchedAtDesc(LeetcodeProfile profile);
 
-    @Query("SELECT new com.abi.coding_tracker.leaderboard.dto.LeaderboardResponse(0, u.name, s.totalSolved)"+
-            "FROM LeetcodeStatsSnapshot s"+
-            "JOIN s.profile p"+
-            "JOIN p.user u"+
-            "WHERE s.id IN (SELECT MAX(s2.id) FROM LeetcodeStatsSnapshot s2 GROUP BY s2.profile)"+
-            "ORDER BY s.totalSolved DESC")
-    List<LeaderBoardResponse> getGlobalLeaderBoard();
+    @Query("""
+           SELECT u.name AS name, s.totalSolved AS score
+           FROM LeetcodeStatsSnapshot s
+           JOIN s.profile p
+           JOIN p.user u
+           WHERE s.id IN (
+               SELECT MAX(s2.id) 
+               FROM LeetcodeStatsSnapshot s2 
+               GROUP BY s2.profile
+           )
+           ORDER BY s.totalSolved DESC
+           """)
+    List<LeaderboardProjection> getGlobalLeaderboard();
 }

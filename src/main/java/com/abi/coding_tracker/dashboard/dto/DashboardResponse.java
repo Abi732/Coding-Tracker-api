@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.abi.coding_tracker.codeforces.dto.CodeforcesProfileResponse;
+import com.abi.coding_tracker.github.dto.GithubProfileResponse;
 import com.abi.coding_tracker.leetcode.dto.LeetcodeStatsResponse;
 
 import lombok.AllArgsConstructor;

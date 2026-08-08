@@ -1,5 +1,6 @@
 package com.abi.coding_tracker.dashboard.service;
 
+import com.abi.coding_tracker.github.service.GithubProfileService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,11 +13,11 @@ import com.abi.coding_tracker.codeforces.dto.CodeforcesProfileResponse;
 import com.abi.coding_tracker.codeforces.service.CodeforcesProfileService;
 import com.abi.coding_tracker.dashboard.dto.DashboardResponse;
 import com.abi.coding_tracker.dashboard.dto.DashboardStats;
-import com.abi.coding_tracker.dashboard.dto.GithubProfileResponse;
 import com.abi.coding_tracker.dashboard.dto.UserSummary;
 import com.abi.coding_tracker.entity.User;
 import com.abi.coding_tracker.exception.ExternalApiException;
 import com.abi.coding_tracker.exception.ResourceNotFoundException;
+import com.abi.coding_tracker.github.dto.GithubProfileResponse;
 import com.abi.coding_tracker.leetcode.dto.LeetcodeStatsResponse;
 import com.abi.coding_tracker.leetcode.service.LeetcodeProfileService;
 import com.abi.coding_tracker.repository.UserRepository;
@@ -26,14 +27,16 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 public class DashboardService {
+    private final GithubProfileService githubProfileService;
     private final UserRepository userRepository;
     private final LeetcodeProfileService leetcodeProfileService;
     private final CodeforcesProfileService codeforcesProfileService;
 
-    public DashboardService(UserRepository userRepository, LeetcodeProfileService leetcodeProfileService, CodeforcesProfileService codeforcesProfileService){
+    public DashboardService(UserRepository userRepository, LeetcodeProfileService leetcodeProfileService, CodeforcesProfileService codeforcesProfileService, GithubProfileService githubProfileService){
         this.userRepository = userRepository;
         this.leetcodeProfileService = leetcodeProfileService;
         this.codeforcesProfileService = codeforcesProfileService;
+        this.githubProfileService = githubProfileService;
     }
 
     public DashboardResponse getDashboardData(String email){
@@ -86,7 +89,21 @@ public class DashboardService {
         }
 
         GithubProfileResponse githubStats = null;
-        serviceStatus.put("Github","NOT_CONNECTED");
+        try{
+            log.info("Fetching GitHub for dashboard...");
+            githubStats = githubProfileService.fetchAndSaveMyProfile(email);
+            serviceStatus.put("github", "UP");
+            if (!githubStats.getCached()) allCached = false;
+        }catch(ResourceNotFoundException e){
+            serviceStatus.put("github", "NOT_CONNECTED");
+        }catch(ExternalApiException e){
+            serviceStatus.put("github", "DOWN");
+            errors.add("GitHub is currently unavailable.");
+            log.error("Dashboard: GitHub API failed for {}", email);
+        }catch (Exception e) {
+            serviceStatus.put("github", "ERROR");
+            errors.add("Unexpected error fetching GitHub data.");
+        }
 
         DashboardStats aggregateStats = DashboardStats.builder()
                             .totalProblemSolved(totalSolvedAggregate)
@@ -97,7 +114,7 @@ public class DashboardService {
         return DashboardResponse.builder()
                 .Apiversion("v1.0")
                 .generatedAt(LocalDateTime.now())
-                .fullyCached(allCached && (leetcodeStats != null || codeforcesProfile != null))
+                .fullyCached(allCached && (leetcodeStats != null || codeforcesProfile != null ||githubStats != null))
                 .user(userSummary)
                 .leetcode(leetcodeStats)
                 .codeforces(codeforcesProfile)
