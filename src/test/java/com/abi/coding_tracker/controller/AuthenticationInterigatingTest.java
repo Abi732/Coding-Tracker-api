@@ -27,7 +27,7 @@ import jakarta.transaction.Transactional;
 @AutoConfigureMockMvc
 @Transactional
 @TestPropertySource(properties = {
-    "app.secret-key=3cFAj1H2+BvQ5m/9pA4xT7WqE8zY0vN6uL1rO2kM5c=" 
+    "app.secret-key=404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970" 
 })
 public class AuthenticationInterigatingTest {
     
