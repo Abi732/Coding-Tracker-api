@@ -27,9 +27,7 @@ import jakarta.transaction.Transactional;
 @AutoConfigureMockMvc
 @Transactional
 @TestPropertySource(properties = {
-    "spring.datasource.username=postgres",
-    "spring.datasource.password=input_during_test",
-    "app.secret-key=input_it_during_test"
+    "app.secret-key=3cFAj1H2+BvQ5m/9pA4xT7WqE8zY0vN6uL1rO2kM5c=" 
 })
 public class AuthenticationInterigatingTest {
     
