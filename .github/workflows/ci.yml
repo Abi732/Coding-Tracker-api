@@ -69,8 +69,8 @@ jobs:
           MAIL_USERNAME: dummy@gmail.com
           MAIL_PASSWORD: dummypassword
         run: | 
-          ./mvnw clean verify
           chmod +x mvnw
+          ./mvnw clean verify
 
       # Step 13: Add Docker Build to CI
       # This just verifies the Dockerfile is valid and the image builds successfully.
