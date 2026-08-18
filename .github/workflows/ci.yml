@@ -68,7 +68,9 @@ jobs:
           JWT_SECRET: super_secret_test_key_that_is_long_enough
           MAIL_USERNAME: dummy@gmail.com
           MAIL_PASSWORD: dummypassword
-        run: ./mvnw clean verify
+        run: | 
+          ./mvnw clean verify
+          chmod +x mvnw
 
       # Step 13: Add Docker Build to CI
       # This just verifies the Dockerfile is valid and the image builds successfully.
