@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.abi.coding_tracker.entity.User;
@@ -93,6 +94,7 @@ public class GithubProfileService implements CodingPlatformService {
         return githubProfileRepository.save(profile);
     }
 
+    @Cacheable(value = "githubProfile", key = "#userEmail")
     @Transactional
     public GithubProfileResponse fetchAndSaveMyProfile(String userEmail){
         User user = userRepository.findByEmail(userEmail).orElseThrow(()->new ResourceNotFoundException("User Not found"));
@@ -163,6 +165,7 @@ public class GithubProfileService implements CodingPlatformService {
         return response;
     }
 
+    @Cacheable(value = "githubRepositories", key = "#userEmail")
     public List<RepositoryResponse> fetchMyRepositories(String userEmail){
         User user = userRepository.findByEmail(userEmail).orElseThrow(()->new ResourceNotFoundException("User not found"));
         GithubProfile profile = githubProfileRepository.findByUser(user).orElseThrow(()-> new ResourceNotFoundException("Github not connected"));

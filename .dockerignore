@@ -1,0 +1,11 @@
+.git
+.gitignore
+target/
+out/
+build/
+bin/
+.idea/
+.eclipse/
+.vscode/
+*.md
+.env

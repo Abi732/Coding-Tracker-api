@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -86,6 +87,7 @@ public class CodeforcesProfileService implements CodingPlatformService{
         return profileRepository.save(profile);
     }
 
+    @Cacheable(value = "codeforcesStats", key = "#userEmail")
     @Transactional
     public CodeforcesProfileResponse fetchAndSaveMyStats(String userEmail){
         User user = userRepository.findByEmail(userEmail).orElseThrow(()->new ResourceNotFoundException("User not Found"));

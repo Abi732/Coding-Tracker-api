@@ -5,6 +5,8 @@ import java.time.Duration;
 import java.util.List; 
 import java.util.Optional;
 
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Scheduled; 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -201,10 +203,17 @@ public class LeetcodeProfileService implements CodingPlatformService {
         log.info("Finished nightly LeetCode stats sync.");
     }
 
-
+    @Cacheable(value = "leetcodeStats" , key = "#userEmail")
     @Transactional
     public LeetcodeStatsResponse fetchAndSaveMyStats(String userEmail) {
         return fetchAndSaveMyStats(userEmail, false);
+    }
+
+    @CachePut(value = "leetcodeStats", key = "#userEmail")
+    @Transactional
+    public LeetcodeStatsResponse refreshMyStats(String userEmail){
+        log.info("Forcing cache update via @CachePut for {}", userEmail);
+        return fetchAndSaveMyStats(userEmail, true);
     }
 
     private LeetcodeStatsResponse mapSnapshotToResponse(LeetcodeStatsSnapshot snapshot, String username) {

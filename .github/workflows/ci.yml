@@ -1,0 +1,77 @@
+name: Coding Tracker CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+
+    # Step 12: Infrastructure for Tests using GitHub Actions Services
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: coding_tracker_test
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpassword
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      # Step 8: Checkout
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 9: Setup Java 21
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          # Step 18: Dependency Caching
+          cache: 'maven'
+
+      # Step 10 & 11: Maven Build (Compile + Test + Package)
+      # We provide the environment variables our application.properties expects
+      - name: Build and Test with Maven
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_NAME: coding_tracker_test
+          DB_USERNAME: testuser
+          DB_PASSWORD: testpassword
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+          # These can be dummy values for tests unless your tests actually send emails/validate tokens
+          JWT_SECRET: super_secret_test_key_that_is_long_enough
+          MAIL_USERNAME: dummy@gmail.com
+          MAIL_PASSWORD: dummypassword
+        run: ./mvnw clean verify
+
+      # Step 13: Add Docker Build to CI
+      # This just verifies the Dockerfile is valid and the image builds successfully.
+      # Step 14: We are NOT pushing it yet.
+      - name: Build Docker Image
+        run: docker build -t coding-tracker:test-build .

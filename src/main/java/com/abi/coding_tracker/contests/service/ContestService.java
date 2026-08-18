@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.abi.coding_tracker.contests.client.ContestClient;
@@ -29,6 +31,7 @@ public class ContestService {
         this.contestClients = contestClients;
     }
 
+    @Cacheable(value = "contests")
     public List<ContestResponse> getUpcomingContests(){
         log.info("Fetching upcoming contests (Skeleton implementation)");
 
@@ -46,6 +49,7 @@ public class ContestService {
         return liveContests.stream().map(this::mapToResponse).collect(Collectors.toList());
     }
 
+    @CacheEvict(value = "contests", allEntries = true)
     @Transactional
     public void fetchAndSaveContests(){
         log.info("Fetching Contests from all connected platforms ....");

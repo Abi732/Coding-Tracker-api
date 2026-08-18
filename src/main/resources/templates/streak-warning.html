@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; color: #333; }
+        .container { padding: 20px; border: 2px solid #ff9800; border-radius: 8px; max-width: 600px; margin: 0 auto; background-color: #fffde7; }
+        .alert { color: #d84315; font-weight: bold; font-size: 1.2em; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 th:text="'Hi ' + ${name} + ','">Hi User,</h2>
+        <p class="alert">🔥 Your coding streak is at risk!</p>
+        <p>You have an amazing <strong><span th:text="${streak}">0</span>-day streak</strong>, but you haven't solved any problems today.</p>
+        <p>Solve just one problem before midnight to keep your momentum going.</p>
+        <p>Happy Coding!</p>
+    </div>
+</body>
+</html>

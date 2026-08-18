@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; color: #333; }
+        .container { padding: 20px; border: 1px solid #ddd; border-radius: 8px; max-width: 600px; margin: 0 auto; background-color: #f9f9f9; }
+        .stat-box { background: white; padding: 15px; border-radius: 5px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .stat-value { font-size: 1.4em; font-weight: bold; color: #0b57d0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 th:text="'Your Weekly Report, ' + ${name}">Weekly Report</h2>
+        <p>Here is your progress over the last 7 days:</p>
+        
+        <div class="stat-box">
+            <div>Problems Solved: <span class="stat-value" th:text="${problemsSolved}">0</span></div>
+        </div>
+        <div class="stat-box">
+            <div>Current Streak: <span class="stat-value" th:text="${streak} + ' Days'">0 Days</span></div>
+        </div>
+        <div class="stat-box">
+            <div>Codeforces Rating: <span class="stat-value" th:text="${rating}">N/A</span></div>
+        </div>
+        
+        <p><strong>Upcoming Event:</strong> <span th:text="${upcomingContest}">None</span></p>
+        <p>Keep up the great work!</p>
+    </div>
+</body>
+</html>

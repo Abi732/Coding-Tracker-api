@@ -5,8 +5,11 @@ import java.util.List;
 import java.util.Map;
 
 import com.abi.coding_tracker.codeforces.dto.CodeforcesProfileResponse;
+import com.abi.coding_tracker.contests.dto.ContestResponse;
 import com.abi.coding_tracker.github.dto.GithubProfileResponse;
 import com.abi.coding_tracker.leetcode.dto.LeetcodeStatsResponse;
+import com.abi.coding_tracker.notification.dto.NotificationResponse;
+import com.abi.coding_tracker.recommendation.dto.RecommendationResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,6 +27,11 @@ public class DashboardResponse {
     private GithubProfileResponse github;
 
     private DashboardStats statistics;
+
+    private RecommendationResponse recommendations;
+    private ContestResponse upcomingContests;
+
+    private List<NotificationResponse> notifications;
 
     private List<RecentActivity> recentActivitiy;
 

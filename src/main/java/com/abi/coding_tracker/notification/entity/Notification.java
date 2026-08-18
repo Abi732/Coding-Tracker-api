@@ -50,6 +50,14 @@ public class Notification {
     @Column(nullable = false)
     private NotificationStatus status;
 
+    @Builder.Default
+    @Column(nullable = false)
+    private boolean isRead = false;
+
+    @Builder.Default
+    @Column(nullable = false)
+    private int retryCount = 0;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 

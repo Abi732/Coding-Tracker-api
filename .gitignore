@@ -1,11 +1,18 @@
 HELP.md
 target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+
+# CRITICAL FOR CI: Do not ignore the Maven Wrapper files!
+
+!.mvn/wrapper/maven-wrapper.jar
+!mvnw
+!mvnw.cmd
+
+!/src/main//target/
+!/src/test//target/
 target/out/build/bin/
 
-### STS ###
+# STS
+
 .apt_generated
 .classpath
 .factorypath
@@ -14,26 +21,33 @@ target/out/build/bin/
 .springBeans
 .sts4-cache
 
-### IntelliJ IDEA ###
+# IntelliJ IDEA
+
 .idea
 *.iws
 *.iml
 *.ipr
 
-### NetBeans ###
+# NetBeans
+
 /nbproject/private/
 /nbbuild/
 /dist/
 /nbdist/
 /.nb-gradle/
 build/
-!**/src/main/**/build/
-!**/src/test/**/build/
+!/src/main//build/
+!/src/test//build/
 *.log
 logs/
 .DS_Store
 Thumbs.db
-.vscode/launch.json
 
-### VS Code ###
+# VS Code
+
 .vscode/
+
+# Secrets and Environment Variables
+
+.env
+*.env
